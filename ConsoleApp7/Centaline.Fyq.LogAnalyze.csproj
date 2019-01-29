@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="appsettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Centaline.Fyq.LogAnalyze.Mode\Centaline.Fyq.LogAnalyze.Mode.csproj" />
+    <ProjectReference Include="..\Config\Centaline.Fyq.LogAnalyze.Config.csproj" />
+    <ProjectReference Include="..\ElasticSearch\Centaline.Fyq.LogAnalyze.ElasticSearch.csproj" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JSONSchema="http://json.schemastore.org/bungee-plugin" /></VisualStudio></ProjectExtensions>
+
+</Project>

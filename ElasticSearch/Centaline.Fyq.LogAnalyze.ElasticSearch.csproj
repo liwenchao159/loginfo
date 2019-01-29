@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NEST" Version="6.4.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Centaline.Fyq.LogAnalyze.Mode\Centaline.Fyq.LogAnalyze.Mode.csproj" />
+    <ProjectReference Include="..\Config\Centaline.Fyq.LogAnalyze.Config.csproj" />
+  </ItemGroup>
+
+</Project>
