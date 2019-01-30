@@ -5,8 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Centaline.Fyq.LogAnalyze;
 using ElasticSearch;
+using Config;
 
-namespace ConsoleApp7
+namespace Centaline.Fyq.LogAnalyze
 {
     class Program
     {
@@ -23,44 +24,32 @@ namespace ConsoleApp7
             {
                 while (true)
                 {
-                    var path = AppDomain.CurrentDomain.BaseDirectory + string.Format("Log/log{0}.txt", DateTime.Now.ToString("yyyyMMdd"));
-                    var errpath = AppDomain.CurrentDomain.BaseDirectory + string.Format("Log/errlog{0}.txt", DateTime.Now.ToString("yyyyMMdd"));
-                    if (!File.Exists(path))
-                    {
-                        File.CreateText(path);
-                    }
-                    if (!File.Exists(errpath))
-                    {
-                        File.CreateText(errpath);
-                    }
+                    Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
+                    var logDirectionPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Log");
+                    var path = Path.Combine(logDirectionPath, string.Format("log{0}.txt", DateTime.Now.ToString("yyyyMMdd")));
+                    var errpath = Path.Combine(logDirectionPath, string.Format("errlog{0}.txt", DateTime.Now.ToString("yyyyMMdd")));
+                    if (!Directory.Exists(logDirectionPath)) Directory.CreateDirectory(logDirectionPath);
+                    if (!File.Exists(path)) File.CreateText(path);
+                    if (!File.Exists(errpath)) File.CreateText(errpath);
                     var str = string.Empty;
                     LogInfoDto loginfo = null;
                     try
                     {
                         loginfo = RedisHelper.ListRightPop<LogInfoDto>(out str);
+                        if (loginfo != null)
+                        {
+                            ElasticSearchHelper.InSertElastic(loginfo);
+                            if (ConfigHelper.AppName == "FYQ")
+                                WriteInfoToFile(str, path);
+                        }
+                        else
+                        {
+                            Thread.Sleep(100);
+                        }
                     }
                     catch (Exception ex)
                     {
                         WriteInfoToFile(str, errpath);
-                        continue;
-                    }
-                    if (loginfo != null)
-                    {
-
-                        if (loginfo.Paramters.Contains("&"))
-                        {
-                            path = errpath;
-                            continue;
-                        }
-                        else
-                        {
-                            ElasticSearchHelper.InSertElastic(loginfo);
-                        }
-                        WriteInfoToFile(str, path);
-                    }
-                    else
-                    {
-                        Thread.Sleep(100);
                     }
                 }
             });

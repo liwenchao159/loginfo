@@ -30,6 +30,7 @@ namespace ElasticSearch
             var eclient = _elasticClients.TryGetValue(ConfigHelper._ElasticConfig.Host, out _elasticClient);
             if (_elasticClient == null)
             {
+                _elasticClients = new ConcurrentDictionary<string, ElasticClient>();
                 var esHosts = ConfigHelper._ElasticConfig.Host.Split(';');
                 var uris = esHosts.AsEnumerable().Select(t => new Uri(t));
                 var nodess = uris.Select(t => new Node(t));

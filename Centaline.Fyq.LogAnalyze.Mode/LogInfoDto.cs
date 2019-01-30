@@ -58,7 +58,7 @@ namespace Centaline.Fyq.LogAnalyze
         /// </summary>
         [Text]
         public string Paramters { get; set; }
-        [Object]
+        [Nested]
         public ParameterDto ParamDto
         {
             get
@@ -102,6 +102,11 @@ namespace Centaline.Fyq.LogAnalyze
         /// </summary>
         [Number]
         public long TotalExecTime { get; set; }
+        /// <summary>
+        /// 当前登录人
+        /// </summary>
+        [Keyword]
+        public string HttpMethod { get; set; }
         /// <summary>
         /// 请求Url
         /// </summary>

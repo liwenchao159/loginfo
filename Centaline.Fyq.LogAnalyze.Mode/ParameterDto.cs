@@ -7,9 +7,9 @@ namespace Centaline.Fyq.LogAnalyze
     [ElasticsearchType(Name = "parameterdto")]
     public class ParameterDto
     {
-        [Object]
+        [Nested]
         public Dictionary<string, object> GET { get; set; }
-        [Object]
+        [Nested]
         public Dictionary<string, object> POST { get; set; }
     }
 }
