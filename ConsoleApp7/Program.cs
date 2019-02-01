@@ -21,33 +21,35 @@ namespace Centaline.Fyq.LogAnalyze
             //    Console.WriteLine(chan + "订阅到的消息是:" + message);
             //}));
             #endregion
+
             Task.Factory.StartNew(() =>
             {
+                var logDirectionPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Log");
+                var path = Path.Combine(logDirectionPath, string.Format("log{0}.txt", DateTime.Now.ToString("yyyyMMdd")));
+                var errpath = Path.Combine(logDirectionPath, string.Format("errlog{0}.txt", DateTime.Now.ToString("yyyyMMdd")));
+                if (!Directory.Exists(logDirectionPath)) Directory.CreateDirectory(logDirectionPath);
+                if (!File.Exists(path)) File.CreateText(path);
+                if (!File.Exists(errpath)) File.CreateText(errpath);
                 var i = 0;
                 while (true)
                 {
                     Console.WriteLine("查询次数:{0}!", i);
                     i++;
-                    var logDirectionPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Log");
-                    var path = Path.Combine(logDirectionPath, string.Format("log{0}.txt", DateTime.Now.ToString("yyyyMMdd")));
-                    var errpath = Path.Combine(logDirectionPath, string.Format("errlog{0}.txt", DateTime.Now.ToString("yyyyMMdd")));
-                    if (!Directory.Exists(logDirectionPath)) Directory.CreateDirectory(logDirectionPath);
-                    if (!File.Exists(path)) File.CreateText(path);
-                    if (!File.Exists(errpath)) File.CreateText(errpath);
                     var str = string.Empty;
-                    LogInfoDto loginfo = null;
                     try
                     {
-                        loginfo = RedisHelper.ListRightPop<LogInfoDto>(out str);
-                        if (loginfo != null)
+                        using (var loginfo = RedisHelper.ListRightPop<LogInfoDto>(out str))
                         {
-                            ElasticSearchHelper.InSertElastic(loginfo);
-                            if (ConfigHelper.AppName == "FYQ")
-                                WriteInfoToFile(str, path);
-                        }
-                        else
-                        {
-                            Thread.Sleep(1000);
+                            if (loginfo != null)
+                            {
+                                ElasticSearchHelper.InSertElastic(loginfo);
+                                if (ConfigHelper.AppName == "FYQ")
+                                    WriteInfoToFile(str, path);
+                            }
+                            else
+                            {
+                                Thread.Sleep(3000);
+                            }
                         }
                     }
                     catch (Exception ex)
