@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Centaline.Fyq.LogAnalyze;
 using ElasticSearch;
 using Config;
+using System.Net.NetworkInformation;
 
 namespace Centaline.Fyq.LogAnalyze
 {
@@ -22,9 +23,11 @@ namespace Centaline.Fyq.LogAnalyze
             #endregion
             Task.Factory.StartNew(() =>
             {
+                var i = 0;
                 while (true)
                 {
-                    Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
+                    Console.WriteLine("查询次数:{0}!", i);
+                    i++;
                     var logDirectionPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Log");
                     var path = Path.Combine(logDirectionPath, string.Format("log{0}.txt", DateTime.Now.ToString("yyyyMMdd")));
                     var errpath = Path.Combine(logDirectionPath, string.Format("errlog{0}.txt", DateTime.Now.ToString("yyyyMMdd")));
@@ -44,12 +47,13 @@ namespace Centaline.Fyq.LogAnalyze
                         }
                         else
                         {
-                            Thread.Sleep(100);
+                            Thread.Sleep(1000);
                         }
                     }
                     catch (Exception ex)
                     {
                         WriteInfoToFile(str, errpath);
+                        Ping t = new Ping();
                     }
                 }
             });
@@ -61,7 +65,6 @@ namespace Centaline.Fyq.LogAnalyze
             if (!string.IsNullOrEmpty(str))
             {
                 Console.WriteLine(str);
-                FileInfo fi = new FileInfo(path);
                 using (StreamWriter fs = new StreamWriter(path, true))
                 {
                     fs.WriteLine(str);

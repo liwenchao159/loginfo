@@ -56,7 +56,30 @@ namespace ElasticSearch
         /// <param name="loginfo"></param>
         public static void InSertElastic(LogInfoDto loginfo)
         {
-            GetElasticClient().IndexDocument(loginfo);
+            if (loginfo.LogStatus == "UPDATE")
+            {
+                InsertData(loginfo);
+            }
+            else
+            {
+                var log = GetDataById(loginfo.RequestId);
+                if ((log != null && log.LogStatus == "INSERT") && log == null)
+                {
+                    InsertData(log);
+                }
+            }
+        }
+        public static void InsertData(LogInfoDto loginfo)
+        {
+            GetElasticClient().Index(new IndexRequest<LogInfoDto>(loginfo, LogIndex, "loginfo", loginfo.RequestId));
+        }
+        public static LogInfoDto GetDataById(string id)
+        {
+            var searchRequest = new SearchRequest<LogInfoDto>()
+            {
+                Query = new TermQuery { Field = new Field("_id"), Value = id }
+            };
+            return GetElasticClient().Search<LogInfoDto>(searchRequest).Documents.FirstOrDefault();
         }
     }
 }
