@@ -39,17 +39,30 @@ namespace ElasticSearch
                 _elasticClient = new ElasticClient(settings);
                 _elasticClients.TryAdd(ConfigHelper._ElasticConfig.Host, _elasticClient);
             }
-            var result = _elasticClient.IndexExists(LogIndex);
+            return _elasticClient;
+        }
+        /// <summary>
+        /// 集群是否可用
+        /// </summary>
+        public static bool ClusterIsValid
+        {
+            get
+            {
+                var status = GetElasticClient().ClusterState(t => new ClusterStateRequest());
+
+                return GetElasticClient().ClusterHealth(t => new ClusterHealthRequest(LogIndex)).IsValid;
+            }
+        }
+        public static void CreateLogIndex()
+        {
+            var result = GetElasticClient().IndexExists(LogIndex);
             if (!result.Exists)
             {
                 var indexDesc = new CreateIndexDescriptor(LogIndex).Settings(s => s.NumberOfReplicas(4).NumberOfReplicas(0)).
                     Mappings(ms => ms.Map<LogInfoDto>(m => m.AutoMap()));
-                _elasticClient.CreateIndex(indexDesc);
+                GetElasticClient().CreateIndex(indexDesc);
             }
-            return _elasticClient;
         }
-
-
         /// <summary>
         /// 索引插入
         /// </summary>
@@ -71,6 +84,7 @@ namespace ElasticSearch
         }
         public static void InsertData(LogInfoDto loginfo)
         {
+            CreateLogIndex();
             GetElasticClient().Index(new IndexRequest<LogInfoDto>(loginfo, LogIndex, "loginfo", loginfo.RequestId));
         }
         public static LogInfoDto GetDataById(string id)

@@ -38,24 +38,31 @@ namespace Centaline.Fyq.LogAnalyze
                     var str = string.Empty;
                     try
                     {
-                        using (var loginfo = RedisHelper.ListRightPop<LogInfoDto>(out str))
+                        if (ElasticSearchHelper.ClusterIsValid)
                         {
-                            if (loginfo != null)
+                            using (var loginfo = RedisHelper.ListRightPop<LogInfoDto>(out str))
                             {
-                                ElasticSearchHelper.InSertElastic(loginfo);
-                                if (ConfigHelper.AppName == "FYQ")
-                                    WriteInfoToFile(str, path);
+                                if (loginfo != null)
+                                {
+                                    ElasticSearchHelper.InSertElastic(loginfo);
+                                    if (ConfigHelper.AppName == "FYQ")
+                                        WriteInfoToFile(str, path);
+                                }
+                                else
+                                {
+                                    Thread.Sleep(3000);
+                                }
                             }
-                            else
-                            {
-                                Thread.Sleep(3000);
-                            }
+                        }
+                        else
+                        {
+                            Thread.Sleep(3000);
                         }
                     }
                     catch (Exception ex)
                     {
-                        WriteInfoToFile(str, errpath);
-                        Ping t = new Ping();
+                        Thread.Sleep(3000);
+                        WriteInfoToFile("ErrorLog_"+DateTime.Now.ToString()+ex.Message, errpath);
                     }
                 }
             });
