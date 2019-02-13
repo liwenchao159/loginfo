@@ -7,6 +7,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace ElasticSearch
 {
@@ -48,6 +49,7 @@ namespace ElasticSearch
         {
             get
             {
+                return true;
                 var status = GetElasticClient().ClusterState(t => new ClusterStateRequest());
 
                 return GetElasticClient().ClusterHealth(t => new ClusterHealthRequest(LogIndex)).IsValid;
@@ -69,17 +71,25 @@ namespace ElasticSearch
         /// <param name="loginfo"></param>
         public static void InSertElastic(LogInfoDto loginfo)
         {
-            if (loginfo.LogStatus == "UPDATE")
+            try
             {
-                InsertData(loginfo);
-            }
-            else
-            {
-                var log = GetDataById(loginfo.RequestId);
-                if ((log != null && log.LogStatus == "INSERT") && log == null)
+                if (loginfo.LogStatus == "UPDATE")
                 {
-                    InsertData(log);
+                    InsertData(loginfo);
                 }
+                else
+                {
+                    var log = GetDataById(loginfo.RequestId);
+                    if ((log != null && log.LogStatus == "INSERT") && log == null)
+                    {
+                        InsertData(log);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Thread.Sleep(3000);
+                InSertElastic(loginfo);
             }
         }
         public static void InsertData(LogInfoDto loginfo)

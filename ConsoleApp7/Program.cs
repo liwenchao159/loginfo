@@ -38,31 +38,24 @@ namespace Centaline.Fyq.LogAnalyze
                     var str = string.Empty;
                     try
                     {
-                        if (ElasticSearchHelper.ClusterIsValid)
+                        using (var loginfo = RedisHelper.ListRightPop<LogInfoDto>(out str))
                         {
-                            using (var loginfo = RedisHelper.ListRightPop<LogInfoDto>(out str))
+                            if (loginfo != null)
                             {
-                                if (loginfo != null)
-                                {
-                                    ElasticSearchHelper.InSertElastic(loginfo);
-                                    if (ConfigHelper.AppName == "FYQ")
-                                        WriteInfoToFile(str, path);
-                                }
-                                else
-                                {
-                                    Thread.Sleep(3000);
-                                }
+                                ElasticSearchHelper.InSertElastic(loginfo);
+                                if (ConfigHelper.AppName == "FYQ")
+                                    WriteInfoToFile(str, path);
                             }
-                        }
-                        else
-                        {
-                            Thread.Sleep(3000);
+                            else
+                            {
+                                Thread.Sleep(3000);
+                            }
                         }
                     }
                     catch (Exception ex)
                     {
                         Thread.Sleep(3000);
-                        WriteInfoToFile("ErrorLog_"+DateTime.Now.ToString()+ex.Message, errpath);
+                        WriteInfoToFile("ErrorLog_" + DateTime.Now.ToString() + ex.Message, errpath);
                     }
                 }
             });
@@ -74,10 +67,10 @@ namespace Centaline.Fyq.LogAnalyze
             if (!string.IsNullOrEmpty(str))
             {
                 Console.WriteLine(str);
-                using (StreamWriter fs = new StreamWriter(path, true))
-                {
-                    fs.WriteLine(str);
-                }
+                //using (StreamWriter fs = new StreamWriter(path, true))
+                //{
+                //    fs.WriteLine(str);
+                //}
             }
         }
     }

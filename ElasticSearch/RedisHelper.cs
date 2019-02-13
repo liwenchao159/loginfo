@@ -1,6 +1,7 @@
 ﻿using Config;
 using Newtonsoft.Json;
 using StackExchange.Redis;
+using System.Threading;
 
 namespace Centaline.Fyq.LogAnalyze.ElasticSearch
 {
@@ -63,14 +64,25 @@ namespace Centaline.Fyq.LogAnalyze.ElasticSearch
 
         public static T ListRightPop<T>(out string logStr)
         {
+            try
+            {
+                return GetDataFromRedis<T>(out logStr);
+            }
+            catch (System.Exception ex)
+            {
+                Thread.Sleep(3000);
+                return ListRightPop<T>(out logStr);
+            }
+        }
+
+        public static T GetDataFromRedis<T>(out string logStr)
+        {
             var strs = ClientManagers.GetDatabase().ListRightPop(ConfigHelper.AppName + ConfigHelper._RedisConfig.Key);
             logStr = string.Empty;
             if (strs.HasValue)
             {
                 logStr = strs.ToString();
-
                 var log = JsonConvert.DeserializeObject<T>(logStr);
-
                 return log;
             }
             return default(T);
