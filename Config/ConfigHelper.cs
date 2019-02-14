@@ -9,9 +9,14 @@ namespace Config
     public static class ConfigHelper
     {
         private static IServiceCollection services = new ServiceCollection();
+        public static IConfigurationRoot _config;
         private static IConfigurationRoot GetConfigBuilder()
         {
-            return new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", true, true).Build();
+            if (_config == null)
+            {
+                _config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", true, true).Build();
+            }
+            return _config;
         }
         /// <summary>
         /// 获取配置文件信息

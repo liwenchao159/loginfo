@@ -43,25 +43,7 @@ namespace Centaline.Fyq.LogAnalyze.ElasticSearch
                 return ClientManagers.GetSubscriber();
             }
         }
-
-        public static ConnectionMultiplexer ClientManager(string writeHosts)
-        {
-
-            if (_ClientManagers == null)
-            {
-                lock (lockobj)
-                {
-                    if (_ClientManagers == null)
-                    {
-                        _ClientManagers = ConnectionMultiplexer.Connect(string.Format("password={0}", writeHosts.Replace('@', ',')));
-                    }
-                }
-            }
-            return _ClientManagers;
-        }
         static ConnectionMultiplexer _ClientManagers = null;
-
-
         public static T ListRightPop<T>(out string logStr)
         {
             try

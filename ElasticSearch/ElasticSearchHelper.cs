@@ -16,8 +16,7 @@ namespace ElasticSearch
     /// </summary>
     public static class ElasticSearchHelper
     {
-        private static ConcurrentDictionary<string, ElasticClient> _elasticClients = new ConcurrentDictionary<string, ElasticClient>();
-
+        private static object lockobj = new object();
         private static string LogIndex
         {
             get
@@ -25,42 +24,40 @@ namespace ElasticSearch
                 return ConfigHelper.AppName.ToLower() + ConfigHelper._ElasticConfig.Index.ToLower();
             }
         }
-        private static ElasticClient GetElasticClient()
+        private static IConnectionPool _pool
         {
-            ElasticClient _elasticClient;
-            var eclient = _elasticClients.TryGetValue(ConfigHelper._ElasticConfig.Host, out _elasticClient);
-            if (_elasticClient == null)
+            get
             {
-                _elasticClients = new ConcurrentDictionary<string, ElasticClient>();
                 var esHosts = ConfigHelper._ElasticConfig.Host.Split(';');
                 var uris = esHosts.AsEnumerable().Select(t => new Uri(t));
                 var nodess = uris.Select(t => new Node(t));
                 var pools = new SniffingConnectionPool(nodess);
-                var settings = new ConnectionSettings(pools).DefaultIndex(LogIndex).DisableDirectStreaming(true);
-                _elasticClient = new ElasticClient(settings);
-                _elasticClients.TryAdd(ConfigHelper._ElasticConfig.Host, _elasticClient);
+                return pools;
             }
-            return _elasticClient;
         }
-        /// <summary>
-        /// 集群是否可用
-        /// </summary>
-        public static bool ClusterIsValid
-        {
-            get
-            {
-                return true;
-                var status = GetElasticClient().ClusterState(t => new ClusterStateRequest());
+        private static ElasticClient _client;
 
-                return GetElasticClient().ClusterHealth(t => new ClusterHealthRequest(LogIndex)).IsValid;
+        private static ElasticClient GetElasticClient()
+        {
+            if (_client == null)
+            {
+                lock (lockobj)
+                {
+                    if (_client == null)
+                    {
+                        var settings = new ConnectionSettings(_pool).DefaultIndex(LogIndex).DisableDirectStreaming(true);
+                        _client = new ElasticClient(settings);
+                    }
+                }
             }
+            return _client;
         }
         public static void CreateLogIndex()
         {
             var result = GetElasticClient().IndexExists(LogIndex);
             if (!result.Exists)
             {
-                var indexDesc = new CreateIndexDescriptor(LogIndex).Settings(s => s.NumberOfReplicas(4).NumberOfReplicas(0)).
+                var indexDesc = new CreateIndexDescriptor(LogIndex).Settings(s => s.NumberOfShards(4).NumberOfShards(0)).
                     Mappings(ms => ms.Map<LogInfoDto>(m => m.AutoMap()));
                 GetElasticClient().CreateIndex(indexDesc);
             }
@@ -84,6 +81,7 @@ namespace ElasticSearch
                     {
                         InsertData(log);
                     }
+                    log = null;
                 }
             }
             catch (Exception ex)
@@ -94,7 +92,7 @@ namespace ElasticSearch
         }
         public static void InsertData(LogInfoDto loginfo)
         {
-            CreateLogIndex();
+          //  CreateLogIndex();
             GetElasticClient().Index(new IndexRequest<LogInfoDto>(loginfo, LogIndex, "loginfo", loginfo.RequestId));
         }
         public static LogInfoDto GetDataById(string id)
