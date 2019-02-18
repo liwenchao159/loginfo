@@ -63,7 +63,14 @@ namespace Centaline.Fyq.LogAnalyze
         {
             get
             {
-                return JsonConvert.DeserializeObject<ParameterDto>(this.Paramters);
+                try
+                {
+                    return JsonConvert.DeserializeObject<ParameterDto>(this.Paramters);
+                }
+                catch (Exception ex)
+                {
+                    return default(ParameterDto);
+                }
             }
         }
         /// <summary>
