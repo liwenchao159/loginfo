@@ -65,7 +65,31 @@ namespace Centaline.Fyq.LogAnalyze
             {
                 try
                 {
-                    return JsonConvert.DeserializeObject<ParameterDto>(this.Paramters);
+                    var dicts = JsonConvert.DeserializeObject<PostGetParameter>(this.Paramters);
+                    if (dicts != null)
+                    {
+                        var parameters = new ParameterDto()
+                        {
+                            POST = new System.Collections.Generic.List<KeyValueDto>(),
+                            GET = new System.Collections.Generic.List<KeyValueDto>()
+                        };
+                        if (dicts.POST != null)
+                        {
+                            foreach (var d in dicts.POST)
+                            {
+                                parameters.POST.Add(new KeyValueDto { Key = d.Key, Value = d.Value });
+                            }
+                        }
+                        if (dicts.GET != null)
+                        {
+                            foreach (var d in dicts.GET)
+                            {
+                                parameters.POST.Add(new KeyValueDto { Key = d.Key, Value = d.Value });
+                            }
+                        }
+                        return parameters;
+                    }
+                    return default(ParameterDto);
                 }
                 catch (Exception ex)
                 {

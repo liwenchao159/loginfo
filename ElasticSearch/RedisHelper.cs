@@ -52,6 +52,7 @@ namespace Centaline.Fyq.LogAnalyze.ElasticSearch
             }
             catch (System.Exception ex)
             {
+                System.Console.WriteLine("Redis异常:" + ex.Message);
                 Thread.Sleep(3000);
                 return ListRightPop<T>(out logStr);
             }

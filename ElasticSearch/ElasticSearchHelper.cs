@@ -57,7 +57,7 @@ namespace ElasticSearch
             var result = GetElasticClient().IndexExists(LogIndex);
             if (!result.Exists)
             {
-                var indexDesc = new CreateIndexDescriptor(LogIndex).Settings(s => s.NumberOfShards(4).NumberOfShards(0)).
+                var indexDesc = new CreateIndexDescriptor(LogIndex).Settings(s => s.NumberOfShards(4).NumberOfReplicas(0)).
                     Mappings(ms => ms.Map<LogInfoDto>(m => m.AutoMap()));
                 GetElasticClient().CreateIndex(indexDesc);
             }
@@ -77,31 +77,35 @@ namespace ElasticSearch
                 else
                 {
                     var log = GetDataById(loginfo.RequestId);
-                    if ((log != null && log.LogStatus == "INSERT") && log == null)
+                    if ((log != null && log.LogStatus == "INSERT") || log == null)
                     {
-                        InsertData(log);
+                        InsertData(loginfo);
                     }
-                    log = null;
                 }
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Es异常:" + ex.Message);
                 Thread.Sleep(3000);
                 InSertElastic(loginfo);
             }
         }
         public static void InsertData(LogInfoDto loginfo)
         {
-          //  CreateLogIndex();
-            GetElasticClient().Index(new IndexRequest<LogInfoDto>(loginfo, LogIndex, "loginfo", loginfo.RequestId));
+            CreateLogIndex();
+            var result = GetElasticClient().Index(new IndexRequest<LogInfoDto>(loginfo, LogIndex, "loginfo", loginfo.RequestId));
+            if (!result.IsValid) throw result.OriginalException;
         }
         public static LogInfoDto GetDataById(string id)
         {
+            CreateLogIndex();
             var searchRequest = new SearchRequest<LogInfoDto>()
             {
                 Query = new TermQuery { Field = new Field("_id"), Value = id }
             };
-            return GetElasticClient().Search<LogInfoDto>(searchRequest).Documents.FirstOrDefault();
+            var result = GetElasticClient().Search<LogInfoDto>(searchRequest);
+            if (!result.IsValid) throw result.OriginalException;
+            return result.Documents.FirstOrDefault();
         }
     }
 }
