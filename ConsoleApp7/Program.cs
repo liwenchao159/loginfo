@@ -30,7 +30,7 @@ namespace Centaline.Fyq.LogAnalyze
             int i = 0;
             while (true)
             {
-                Console.WriteLine("数据查询中...testcore111....{0}", i);
+              //  Console.WriteLine("数据查询中...testcore111....{0}", i);
                 var str = string.Empty;
                 i++;
                 try
@@ -40,7 +40,7 @@ namespace Centaline.Fyq.LogAnalyze
                     {
                         ElasticSearchHelper.InSertElastic(loginfo);
                         if (ConfigHelper.AppName == "FYQ")
-                            WriteInfoToFile(str, path);
+                           // WriteInfoToFile(str, path);
                     }
                     else
                     {
