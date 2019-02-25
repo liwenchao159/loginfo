@@ -39,8 +39,9 @@ namespace Centaline.Fyq.LogAnalyze
                     if (loginfo != null)
                     {
                         ElasticSearchHelper.InSertElastic(loginfo);
-                        if (ConfigHelper.AppName == "FYQ")
-                           // WriteInfoToFile(str, path);
+                        if (ConfigHelper.AppName == "FYQ") {
+                            // WriteInfoToFile(str, path);
+                        }
                     }
                     else
                     {
