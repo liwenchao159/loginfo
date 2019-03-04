@@ -25,6 +25,12 @@
     <ProjectReference Include="..\ElasticSearch\Centaline.Fyq.LogAnalyze.ElasticSearch.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.dev.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JSONSchema="http://json.schemastore.org/bungee-plugin" /></VisualStudio></ProjectExtensions>
 
 </Project>
