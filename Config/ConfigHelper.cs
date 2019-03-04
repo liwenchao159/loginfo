@@ -14,7 +14,7 @@ namespace Config
         {
             if (_config == null)
             {
-                _config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile($"appsettings-{Environment.GetEnvironmentVariable("app")}.json", true, true).Build();
+                _config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile($"appsettings-{Environment.GetEnvironmentVariable("APP")}.json", true, true).Build();
             }
             return _config;
         }

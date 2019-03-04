@@ -31,7 +31,7 @@ namespace Centaline.Fyq.LogAnalyze
 
             while (true)
             {
-                   Console.WriteLine("数据查询中...testcore111....{0}", i);
+                 Console.WriteLine("数据查询中...testcore111....{0}", i);
                 var str = string.Empty;
                 i++;
                 try

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Centaline.Fyq.LogAnalyze": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "app": "dev"
+      }
+    }
+  }
+}
