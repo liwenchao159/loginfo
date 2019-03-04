@@ -28,9 +28,10 @@ namespace Centaline.Fyq.LogAnalyze
             if (!File.Exists(path)) File.CreateText(path);
             if (!File.Exists(errpath)) File.CreateText(errpath);
             int i = 0;
+
             while (true)
             {
-              //  Console.WriteLine("数据查询中...testcore111....{0}", i);
+                //  Console.WriteLine("数据查询中...testcore111....{0}", i);
                 var str = string.Empty;
                 i++;
                 try
@@ -39,7 +40,8 @@ namespace Centaline.Fyq.LogAnalyze
                     if (loginfo != null)
                     {
                         ElasticSearchHelper.InSertElastic(loginfo);
-                        if (ConfigHelper.AppName == "FYQ") {
+                        if (ConfigHelper.AppName == "FYQ")
+                        {
                             // WriteInfoToFile(str, path);
                         }
                     }
@@ -68,5 +70,6 @@ namespace Centaline.Fyq.LogAnalyze
                 //}
             }
         }
+
     }
 }

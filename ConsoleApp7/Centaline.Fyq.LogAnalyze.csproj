@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Centaline.Fyq.LogAnalyze.Mode\Centaline.Fyq.LogAnalyze.Mode.csproj" />
     <ProjectReference Include="..\Config\Centaline.Fyq.LogAnalyze.Config.csproj" />
     <ProjectReference Include="..\ElasticSearch\Centaline.Fyq.LogAnalyze.ElasticSearch.csproj" />
